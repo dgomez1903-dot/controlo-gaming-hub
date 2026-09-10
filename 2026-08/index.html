@@ -237,7 +237,7 @@
 
   <footer>
     <span class="status" id="status"></span>
-    <button id="reset">Limpar todos os pagamentos</button>
+    <span><button id="sync">Sincronização</button> · <button id="reset">Limpar todos os pagamentos</button></span>
   </footer>
 </div>
 
@@ -306,9 +306,40 @@
      b:'Monaco, Lahera, Ian Carvalho e Nelly saem todos a 15/09, somando 31.916,67. É também o 10.º dia útil de setembro, porque o dia 7 (Independência) é feriado.'}
   ];
 
-  var STORE = (window.storage && window.storage.get) ? window.storage : {
-    get: function(k){ var v = localStorage.getItem(k); if(v===null) throw new Error('sem registo'); return Promise.resolve({key:k, value:v}); },
-    set: function(k,v){ localStorage.setItem(k,v); return Promise.resolve({key:k, value:v}); }
+  // ---- Sincronização: colar aqui o endereço do Worker ----------------
+  var API = 'COLAR_AQUI';   // ex: https://controlo-estado.o-teu-nome.workers.dev
+  // --------------------------------------------------------------------
+
+  var remoto = false;
+  function pw(){ try{ return localStorage.getItem('gh:pw') || ''; }catch(e){ return ''; } }
+  function ligado(){ return API.indexOf('http') === 0 && pw() !== ''; }
+
+  var STORE = {
+    get: async function(k){
+      if(window.storage && window.storage.get) return window.storage.get(k);
+      if(ligado()){
+        var r = await fetch(API+'?k='+encodeURIComponent(k), { headers:{'X-Pw':pw()} });
+        if(r.status === 401){ remoto = false; throw new Error('senha errada'); }
+        if(r.ok){ remoto = true; var t = await r.text(); localStorage.setItem(k,t); return {key:k, value:t}; }
+        if(r.status === 404){ remoto = true; throw new Error('sem registo'); }
+        remoto = false;
+      }
+      var v = localStorage.getItem(k);
+      if(v === null) throw new Error('sem registo');
+      return {key:k, value:v};
+    },
+    set: async function(k,v){
+      if(window.storage && window.storage.set) return window.storage.set(k,v);
+      localStorage.setItem(k,v);
+      if(ligado()){
+        var r = await fetch(API+'?k='+encodeURIComponent(k), {
+          method:'POST', headers:{'X-Pw':pw(),'Content-Type':'application/json'}, body:v
+        });
+        remoto = r.ok;
+        if(!r.ok) throw new Error('remoto falhou');
+      }
+      return {key:k, value:v};
+    }
   };
 
   var state = { obs:{}, emps:{}, cash:{ saldo:14515.27, rate:5.93 } };
@@ -328,9 +359,10 @@
     try{
       st.textContent = 'A guardar…';
       await STORE.set(KEY, JSON.stringify(state));
-      st.textContent = 'Guardado. As marcações ficam nesta dashboard.';
+      st.textContent = remoto ? 'Sincronizado — visível em todos os dispositivos.'
+                              : 'Guardado só neste dispositivo.';
     }catch(e){
-      st.textContent = 'Não foi possível guardar. As marcações valem só até fechares esta janela.';
+      st.textContent = 'Guardado neste dispositivo, mas a sincronização falhou. Verifica a senha.';
     }
   }
 
@@ -338,9 +370,12 @@
     try{
       var r = await STORE.get(KEY);
       if(r && r.value){ var v = JSON.parse(r.value); state.obs = v.obs||{}; state.emps = v.emps||{}; if(v.cash) state.cash = v.cash; }
-      st.textContent = 'Guardado. As marcações ficam nesta dashboard.';
+      st.textContent = remoto ? 'Sincronizado — visível em todos os dispositivos.'
+                              : (ligado() ? 'Guardado só neste dispositivo.' : 'Sem sincronização. Clica em Sincronização para ligar.');
     }catch(e){
-      st.textContent = 'Sem estado anterior guardado — começa do zero.';
+      st.textContent = e.message === 'senha errada'
+        ? 'Senha errada. Clica em Sincronização para a corrigir.'
+        : 'Sem registo anterior — começa do zero.';
     }
   }
 
@@ -476,6 +511,14 @@
   document.getElementById('reset').addEventListener('click', function(){
     state = { obs:{}, emps:{}, cash: state.cash };
     renderAll(); save();
+  });
+
+  document.getElementById('sync').addEventListener('click', function(){
+    var atual = pw();
+    var nova = prompt('Senha de sincronização (a mesma em todos os dispositivos):', atual);
+    if(nova === null) return;
+    try{ localStorage.setItem('gh:pw', nova.trim()); }catch(e){}
+    load().then(renderAll);
   });
 
   bindCash();
