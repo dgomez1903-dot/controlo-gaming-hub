@@ -318,7 +318,7 @@
     get: async function(k){
       if(window.storage && window.storage.get) return window.storage.get(k);
       if(ligado()){
-        var r = await fetch(API+'?k='+encodeURIComponent(k), { headers:{'X-Pw':pw()} });
+                var r = await fetch(API+'?k='+encodeURIComponent(k)+'&t='+Date.now(), { cache:'no-store', headers:{'X-Pw':pw()} });;
         if(r.status === 401){ remoto = false; throw new Error('senha errada'); }
         if(r.ok){ remoto = true; var t = await r.text(); localStorage.setItem(k,t); return {key:k, value:t}; }
         if(r.status === 404){ remoto = true; throw new Error('sem registo'); }
