@@ -1,0 +1,485 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#14202B;
+    --ink-soft:#4C5C68;
+    --ink-faint:#7C8B96;
+    --paper:#E9EDEF;
+    --card:#FFFFFF;
+    --rule:#C9D3DA;
+    --rule-soft:#E1E7EA;
+    --fgts:#1B5E9B;
+    --darf:#4A5B6B;
+    --das:#1F7A4D;
+    --folha:#A8681B;
+    --due:#B3261E;
+    --ok:#1F7A4D;
+    --focus:#1B5E9B;
+  }
+  *{box-sizing:border-box}
+  .gh{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    padding:22px 18px 48px;
+    margin:0 auto;
+    max-width:1080px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  .gh .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+  /* ---------- cabeçalho ---------- */
+  .gh header{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+    border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:22px;
+  }
+  .gh h1{font-size:1.5rem;font-weight:600;margin:0 0 2px;letter-spacing:-.015em}
+  .gh .cnpj{font-size:.78rem;color:var(--ink-soft)}
+  .gh .comp{text-align:right}
+  .gh .comp b{display:block;font-size:1.15rem;font-weight:600}
+  .gh .comp span{font-size:.72rem;color:var(--ink-soft)}
+
+  /* ---------- talão de resumo (estilo guia) ---------- */
+  .gh .stub{
+    display:grid;grid-template-columns:1fr auto;gap:0;
+    border:1.5px solid var(--ink);background:var(--card);margin-bottom:26px;
+  }
+  .gh .stub-left{padding:16px 18px}
+  .gh .stub-left h2{margin:0 0 10px;font-size:.8rem;font-weight:600;color:var(--ink-soft)}
+  .gh .bar{height:12px;background:var(--rule-soft);border:1px solid var(--rule);display:flex;overflow:hidden}
+  .gh .bar i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
+  .gh .stub-meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-size:.78rem;color:var(--ink-soft)}
+  .gh .stub-meta b{color:var(--ink);font-weight:600}
+  .gh .stub-right{
+    background:var(--ink);color:#fff;padding:16px 22px;text-align:right;min-width:230px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .gh .stub-right span{font-size:.72rem;opacity:.75;display:block}
+  .gh .stub-right .val{font-size:2.1rem;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+
+  /* ---------- caixa ---------- */
+  .gh .cash{
+    display:grid;grid-template-columns:1fr 300px;
+    border:1.5px solid var(--ink);background:var(--card);
+  }
+  .gh .cash-in{padding:16px 18px}
+  .gh .cash-in label{display:block;font-size:.74rem;color:var(--ink-soft);margin-bottom:10px}
+  .gh .cash-in input{
+    display:block;margin-top:4px;width:100%;max-width:230px;
+    font-family:"IBM Plex Mono",monospace;font-size:1rem;font-variant-numeric:tabular-nums;
+    padding:7px 9px;border:1px solid var(--rule);background:#FAFCFC;color:var(--ink);
+  }
+  .gh .cash-in input:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+  .gh .hint{margin:2px 0 0;font-size:.74rem;color:var(--ink-faint);max-width:46ch;line-height:1.5}
+  .gh .cash-out{
+    background:#F5F7F8;border-left:1px solid var(--rule);padding:16px 18px;
+    display:flex;flex-direction:column;justify-content:center;gap:12px;
+  }
+  .gh .cash-line span{display:block;font-size:.72rem;color:var(--ink-soft)}
+  .gh .cash-line b{font-size:1.2rem;font-weight:600}
+  .gh .cash-line.big b{font-size:1.85rem;letter-spacing:-.02em;color:var(--due)}
+  .gh .cash-line.big.ok b{color:var(--ok)}
+
+
+  .gh h3{
+    font-size:.95rem;font-weight:600;margin:0 0 10px;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .gh h3 em{font-style:normal;font-size:.75rem;font-weight:400;color:var(--ink-faint)}
+  .gh section{margin-bottom:30px}
+
+  /* ---------- obrigação ---------- */
+  .gh .ob{
+    background:var(--card);border:1px solid var(--rule);border-left:5px solid var(--tone,var(--ink));
+    padding:14px 16px;margin-bottom:10px;
+    display:grid;grid-template-columns:1fr 150px 140px;gap:14px;align-items:center;
+  }
+  .gh .ob.paid{opacity:.62;border-left-color:var(--ok)}
+  .gh .ob-name{font-weight:600;font-size:.95rem;margin-bottom:3px}
+  .gh .ob-doc{font-size:.72rem;color:var(--ink-faint)}
+  .gh .ob-break{font-size:.76rem;color:var(--ink-soft);margin-top:6px}
+  .gh .ob-val{text-align:right;font-size:1.12rem;font-weight:600}
+  .gh .ob-due{font-size:.74rem;color:var(--ink-soft);text-align:right;margin-top:2px}
+  .gh .ob-due.late{color:var(--due);font-weight:600}
+  .gh .paid-on{font-size:.72rem;color:var(--ok);margin-top:4px;text-align:center}
+
+  .gh button.toggle{
+    font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;width:100%;
+    padding:9px 8px;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);
+  }
+  .gh button.toggle:hover{background:var(--paper)}
+  .gh button.toggle.on{background:var(--ok);border-color:var(--ok);color:#fff}
+  .gh button.toggle:focus-visible,.gh button.mini:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+  /* ---------- tabela folha ---------- */
+  .gh table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--rule);font-size:.85rem}
+  .gh th{
+    text-align:right;font-size:.7rem;font-weight:600;color:var(--ink-soft);
+    padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap;
+  }
+  .gh th:first-child,.gh td:first-child{text-align:left}
+  .gh td{padding:9px 12px;border-bottom:1px solid var(--rule-soft);text-align:right}
+  .gh tbody tr:last-child td{border-bottom:none}
+  .gh tr.done td:not(:last-child){opacity:.5}
+  .gh .role{display:block;font-size:.7rem;color:var(--ink-faint)}
+  .gh tfoot td{border-top:1.5px solid var(--ink);font-weight:600;background:#F5F7F8}
+  .gh button.mini{
+    font:inherit;font-size:.72rem;font-weight:600;cursor:pointer;
+    padding:4px 10px;border:1px solid var(--rule);background:var(--card);color:var(--ink-soft);
+  }
+  .gh button.mini.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  /* ---------- notas ---------- */
+  .gh .notes{background:var(--card);border:1px solid var(--rule);padding:4px 0}
+  .gh .note{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:11px 16px;border-bottom:1px solid var(--rule-soft);font-size:.83rem}
+  .gh .note:last-child{border-bottom:none}
+  .gh .note .flag{font-weight:700;color:var(--due);font-size:.9rem;line-height:1.3}
+  .gh .note .flag.info{color:var(--fgts)}
+  .gh .note .flag.done{color:var(--ok)}
+  .gh .note b{font-weight:600}
+
+  .gh footer{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;
+    font-size:.73rem;color:var(--ink-faint);border-top:1px solid var(--rule);padding-top:12px}
+  .gh footer button{font:inherit;font-size:.73rem;cursor:pointer;background:none;border:none;color:var(--ink-soft);text-decoration:underline;padding:0}
+  .gh .status{font-size:.73rem;color:var(--ink-faint)}
+
+  @media (max-width:720px){
+    .gh .cash{grid-template-columns:1fr}
+    .gh .cash-out{border-left:none;border-top:1px solid var(--rule)}
+    .gh .stub{grid-template-columns:1fr}
+    .gh .stub-right{text-align:left;min-width:0}
+    .gh .ob{grid-template-columns:1fr;gap:10px}
+    .gh .ob-val,.gh .ob-due{text-align:left}
+    .gh th:nth-child(2),.gh td:nth-child(2),.gh th:nth-child(3),.gh td:nth-child(3){display:none}
+  }
+  @media (prefers-reduced-motion:reduce){.gh *{transition:none!important}}
+</style>
+
+<div class="gh">
+  <header>
+    <div>
+      <h1>Gaming Hub — obrigações do mês</h1>
+      <div class="cnpj"><a href="../" style="color:#4C5C68">← todos os meses</a></div>
+      <div class="cnpj mono">CNPJ 54.240.638/0001-29 · Recife/PE · Simples Nacional, Anexo III</div>
+    </div>
+    <div class="comp">
+      <b>08/2026</b>
+      <span>competência agosto</span>
+    </div>
+  </header>
+
+  <div class="stub">
+    <div class="stub-left">
+      <h2 id="progressLabel">A carregar…</h2>
+      <div class="bar"><i id="bar" style="width:0%"></i></div>
+      <div class="stub-meta">
+        <div>Saída total do mês <b class="mono" id="mTotal">—</b></div>
+        <div>Já pago <b class="mono" id="mPaid">—</b></div>
+        <div>Próximo vencimento <b class="mono" id="mNext">—</b></div>
+      </div>
+    </div>
+    <div class="stub-right">
+      <span>Falta pagar</span>
+      <div class="val mono" id="mDue">—</div>
+      <span id="mDueCount"></span>
+    </div>
+  </div>
+
+  <section>
+    <div class="cash">
+      <div class="cash-in">
+        <label>Saldo em conta (BRL)
+          <input id="saldo" type="number" step="0.01" inputmode="decimal">
+        </label>
+        <label>Câmbio EUR → BRL
+          <input id="rate" type="number" step="0.0001" inputmode="decimal">
+        </label>
+        <p class="hint" id="cashHint"></p>
+      </div>
+      <div class="cash-out">
+        <div class="cash-line"><span>Falta reforçar</span><b class="mono" id="gapBrl">—</b></div>
+        <div class="cash-line big"><span>A transferir de Portugal</span><b class="mono" id="gapEur">—</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Guias e folha <em>marca conforme fores pagando</em></h3>
+    <div id="obs"></div>
+  </section>
+
+  <section>
+    <h3>Fornecedores e serviços <em>notas e boletos de agosto</em></h3>
+    <div id="forn"></div>
+  </section>
+
+  <section>
+    <h3>Folha de agosto <em>6 colaboradores · líquido a transferir</em></h3>
+    <table>
+      <thead>
+        <tr><th>Colaborador</th><th>Bruto</th><th>Descontos</th><th>Líquido</th><th>FGTS</th><th></th></tr>
+      </thead>
+      <tbody id="emps"></tbody>
+      <tfoot>
+        <tr><td>Total</td><td class="mono">18.937,43</td><td class="mono">2.408,90</td><td class="mono">16.528,53</td><td class="mono">1.514,78</td><td></td></tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <section>
+    <h3>Notas do mês</h3>
+    <div class="notes" id="notes"></div>
+  </section>
+
+  <footer>
+    <span class="status" id="status"></span>
+    <button id="reset">Limpar todos os pagamentos</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var TODAY = new Date(2026,8,10); // 10/09/2026
+  var KEY = 'gaminghub:082026:v1';
+
+  var OBS = [
+    { id:'folha', name:'Salários líquidos', tone:'var(--folha)',
+      doc:'Folha analítica 01/08 a 31/08/2026 · 6 colaboradores',
+      brk:'Bruto 18.937,43 − descontos 2.408,90 (INSS 1.670,68 · IRRF 89,53 · consignado 646,17)',
+      val:16528.53, due:'2026-09-05', dueTxt:'venceu 05/09/2026' },
+    { id:'fgts', name:'FGTS Digital + Consignado', tone:'var(--fgts)',
+      doc:'Guia 0126090359063866-0 · PIX na própria guia',
+      brk:'FGTS mensal 1.657,61 (7 trabalhadores) + consignado retido 646,17',
+      val:2303.78, due:'2026-09-18', dueTxt:'18/09/2026' },
+    { id:'darf', name:'DARF DCTFWeb', tone:'var(--darf)',
+      doc:'Documento 07.16.26247.4668228-6 · recibo 50000524052259',
+      brk:'INSS segurados 1.804,58 (cód. 1082) + IRRF 89,53 (cód. 0561)',
+      val:1894.11, due:'2026-09-18', dueTxt:'18/09/2026' },
+    { id:'das', name:'DAS Simples Nacional', tone:'var(--das)',
+      doc:'Documento 07.20.26252.4900954-5 · receita bruta 29.000,00',
+      brk:'INSS/CPP 1.213,86 · ISS 909,00 · COFINS 381,50 · IRPJ 111,88 · CSLL 97,89 · PIS 82,79',
+      val:2796.92, due:'2026-09-21', dueTxt:'21/09/2026' }
+  ];
+
+  var FORN = [
+    { id:'monaco', name:'Monaco Consultoria e Tecnologia', tone:'#5B3E8E',
+      doc:'NFS-e 7 · CNPJ 65.900.541/0001-11 · Recife/PE',
+      brk:'Consultoria operacional em iGaming, mês 08 · ISS não retido',
+      val:14166.67, due:'2026-09-15', dueTxt:'15/09/2026 · 10.º dia útil' },
+    { id:'lahera', name:'Lahera Assessoria', tone:'#5B3E8E',
+      doc:'NFS-e 4 · CNPJ 46.342.924/0001-77 · Itanhaém/SP',
+      brk:'CRM, retenção e operações de casino · 15/08 a 31/08 · ISS não retido',
+      val:10000.00, due:'2026-09-15', dueTxt:'15/09/2026 · 10.º dia útil' },
+    { id:'ian', name:'Ian Carvalho Araújo (MEI)', tone:'#5B3E8E',
+      doc:'NFS-e 1 · CNPJ 68.874.915/0001-60 · Fortaleza/CE',
+      brk:'Serviços operacionais, administrativos e comerciais · 02/08 a 31/08',
+      val:5000.00, due:'2026-09-15', dueTxt:'15/09/2026 · 10.º dia útil' },
+    { id:'nelly', name:'Nelly — Content', tone:'#5B3E8E',
+      doc:'Nota mensal · documento ainda não recebido',
+      brk:'Conteúdo · valor fixo mensal, pago sempre a dia 15',
+      val:2750.00, due:'2026-09-15', dueTxt:'15/09/2026' },
+    { id:'salgueiro', name:'Salgueiro Contabilidade', tone:'#8E3E5B',
+      doc:'Boleto Itaú · 34191.57007 00023.653173 53530.300002 6 15590000159810',
+      brk:'Honorários de contabilidade · nosso número 157/00000236-5',
+      val:1598.10, due:'2026-09-04', dueTxt:'04/09/2026' }
+  ];
+
+  var ALL = OBS.concat(FORN);
+
+  var EMPS = [
+    {id:'anderson', n:'Anderson Lopes da Silva', r:'Analista de Player Operations', b:3685.16, d:330.80, l:3354.36, f:294.81},
+    {id:'andre',    n:'André Farias Guimarães', r:'Líder de equipa de atendimento Jr', b:2655.05, d:214.63, l:2440.42, f:212.40},
+    {id:'guilherme',n:'Guilherme de Oliveira Caze', r:'Especialista de social media · consignado 84,17', b:5250.00, d:710.20, l:4539.80, f:420.00},
+    {id:'poliana',  n:'Poliana Campos de Oliveira', r:'Agente de apoio ao cliente Jr', b:2091.00, d:163.87, l:1927.13, f:167.28},
+    {id:'victor',   n:'Victor Pereira da Silva', r:'Agente de apoio ao cliente Jr', b:2926.50, d:239.76, l:2686.74, f:234.12},
+    {id:'yago',     n:'Yago Eloi Menezes de Almeida', r:'Agente de apoio ao cliente Jr · consignado 562,00', b:2329.72, d:749.64, l:1580.08, f:186.17}
+  ];
+
+  var NOTES = [
+    {t:'v', h:'Diferenças da guia explicadas: Walter José Santos Filho.',
+     b:'Saiu da empresa e o salário já foi pago fora da folha de agosto. É ele que justifica o FGTS a mais na guia (142,83, base 1.785,42), o INSS a mais na DCTFWeb (133,90) e provavelmente o FGTS de 13.º (105,06). Os valores das guias estão certos — pagar como estão.'},
+    {t:'i', h:'Dia 15 concentra os prestadores.',
+     b:'Monaco, Lahera, Ian Carvalho e Nelly saem todos a 15/09, somando 31.916,67. É também o 10.º dia útil de setembro, porque o dia 7 (Independência) é feriado.'}
+  ];
+
+  var STORE = (window.storage && window.storage.get) ? window.storage : {
+    get: function(k){ var v = localStorage.getItem(k); if(v===null) throw new Error('sem registo'); return Promise.resolve({key:k, value:v}); },
+    set: function(k,v){ localStorage.setItem(k,v); return Promise.resolve({key:k, value:v}); }
+  };
+
+  var state = { obs:{}, emps:{}, cash:{ saldo:14515.27, rate:5.93 } };
+  var st = document.getElementById('status');
+
+  function brl(v){ return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function days(iso){
+    var p = iso.split('-'); var d = new Date(+p[0], p[1]-1, +p[2]);
+    return Math.round((d - TODAY)/86400000);
+  }
+  function stamp(){
+    var d = new Date();
+    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  }
+
+  async function save(){
+    try{
+      st.textContent = 'A guardar…';
+      await STORE.set(KEY, JSON.stringify(state));
+      st.textContent = 'Guardado. As marcações ficam nesta dashboard.';
+    }catch(e){
+      st.textContent = 'Não foi possível guardar. As marcações valem só até fechares esta janela.';
+    }
+  }
+
+  async function load(){
+    try{
+      var r = await STORE.get(KEY);
+      if(r && r.value){ var v = JSON.parse(r.value); state.obs = v.obs||{}; state.emps = v.emps||{}; if(v.cash) state.cash = v.cash; }
+      st.textContent = 'Guardado. As marcações ficam nesta dashboard.';
+    }catch(e){
+      st.textContent = 'Sem estado anterior guardado — começa do zero.';
+    }
+  }
+
+  function renderObs(list, boxId){
+    var box = document.getElementById(boxId); box.innerHTML='';
+    list.forEach(function(o){
+      var paid = state.obs[o.id];
+      var dd = o.due ? days(o.due) : null;
+      var late = !paid && dd !== null && dd < 0;
+      var dueLine = dd === null ? o.dueTxt
+        : paid ? ('vencimento '+o.dueTxt)
+        : (dd < 0 ? ('em atraso · '+o.dueTxt) : (dd === 0 ? ('vence hoje · '+o.dueTxt) : ('faltam '+dd+' dias · '+o.dueTxt)));
+
+      var el = document.createElement('div');
+      el.className = 'ob' + (paid ? ' paid' : '');
+      el.style.setProperty('--tone', o.tone);
+      el.innerHTML =
+        '<div><div class="ob-name">'+o.name+'</div>'+
+        '<div class="ob-doc mono">'+o.doc+'</div>'+
+        '<div class="ob-break">'+o.brk+'</div></div>'+
+        '<div><div class="ob-val mono">'+brl(o.val)+'</div>'+
+        '<div class="ob-due'+(late?' late':'')+'">'+dueLine+'</div></div>'+
+        '<div><button class="toggle'+(paid?' on':'')+'">'+(paid?'Pago':'Marcar pago')+'</button>'+
+        (paid && paid.on ? '<div class="paid-on">em '+paid.on+'</div>' : '')+'</div>';
+
+      el.querySelector('button').addEventListener('click', function(){
+        if(state.obs[o.id]) delete state.obs[o.id];
+        else state.obs[o.id] = { on: stamp() };
+        renderAll(); save();
+      });
+      box.appendChild(el);
+    });
+  }
+
+  function renderEmps(){
+    var tb = document.getElementById('emps'); tb.innerHTML='';
+    EMPS.forEach(function(e){
+      var done = !!state.emps[e.id];
+      var tr = document.createElement('tr');
+      if(done) tr.className='done';
+      tr.innerHTML =
+        '<td><b>'+e.n+'</b><span class="role">'+e.r+'</span></td>'+
+        '<td class="mono">'+brl(e.b)+'</td>'+
+        '<td class="mono">'+brl(e.d)+'</td>'+
+        '<td class="mono">'+brl(e.l)+'</td>'+
+        '<td class="mono">'+brl(e.f)+'</td>'+
+        '<td><button class="mini'+(done?' on':'')+'">'+(done?'transferido':'marcar')+'</button></td>';
+      tr.querySelector('button').addEventListener('click', function(){
+        if(state.emps[e.id]) delete state.emps[e.id]; else state.emps[e.id]=1;
+        renderAll(); save();
+      });
+      tb.appendChild(tr);
+    });
+  }
+
+  function renderNotes(){
+    var box = document.getElementById('notes'); box.innerHTML='';
+    NOTES.forEach(function(n){
+      var d = document.createElement('div');
+      var cls = n.t==='i' ? ' info' : (n.t==='v' ? ' done' : '');
+      var mark = n.t==='i' ? 'i' : (n.t==='v' ? '✓' : '!');
+      d.className='note';
+      d.innerHTML = '<div class="flag'+cls+'">'+mark+'</div>'+
+                    '<div><b>'+n.h+'</b> '+n.b+'</div>';
+      box.appendChild(d);
+    });
+  }
+
+  function renderSummary(){
+    var total=0, paid=0, next=null;
+    ALL.forEach(function(o){
+      total += o.val;
+      if(state.obs[o.id]) paid += o.val;
+      else if(o.due && (!next || o.due < next.due)) next = o;
+    });
+    var dueLeft = total - paid;
+    document.getElementById('mTotal').textContent = brl(total);
+    document.getElementById('mPaid').textContent = brl(paid);
+    document.getElementById('mDue').textContent = brl(dueLeft);
+    document.getElementById('mNext').textContent = next ? next.dueTxt.replace('venceu ','') : 'nenhum';
+    document.getElementById('bar').style.width = (paid/total*100).toFixed(1)+'%';
+
+    var n = ALL.filter(function(o){return !state.obs[o.id];}).length;
+    document.getElementById('progressLabel').textContent =
+      n === 0 ? 'Tudo pago em agosto/2026' : n+' de '+ALL.length+' pagamentos por fazer';
+
+    var sub = '';
+    if(next){
+      var dd = days(next.due);
+      sub = dd < 0 ? next.name+' em atraso' : (dd===0 ? next.name+' vence hoje' : next.name+' em '+dd+' dias');
+    }
+    document.getElementById('mDueCount').textContent = sub;
+  }
+
+  function renderCash(){
+    var due = 0;
+    ALL.forEach(function(o){ if(!state.obs[o.id]) due += o.val; });
+    var saldo = state.cash.saldo || 0;
+    var rate = state.cash.rate || 5.93;
+    var gap = due - saldo;
+
+    document.getElementById('saldo').value = saldo.toFixed(2);
+    document.getElementById('rate').value = rate;
+
+    var big = document.querySelector('.cash-line.big');
+    if(gap > 0){
+      big.classList.remove('ok');
+      document.getElementById('gapBrl').textContent = 'R$ '+brl(gap);
+      document.getElementById('gapEur').textContent = '€ '+brl(gap/rate);
+      document.getElementById('cashHint').textContent =
+        'Faltam '+brl(due)+' para cobrir tudo o que ainda não está marcado como pago. O câmbio é indicativo — a transferência real leva spread e IOF por cima.';
+    }else{
+      big.classList.add('ok');
+      document.getElementById('gapBrl').textContent = 'R$ 0,00';
+      document.getElementById('gapEur').textContent = '€ 0,00';
+      document.getElementById('cashHint').textContent =
+        'O saldo cobre o que falta pagar, com folga de '+brl(-gap)+' BRL.';
+    }
+  }
+
+  function bindCash(){
+    ['saldo','rate'].forEach(function(k){
+      document.getElementById(k).addEventListener('change', function(e){
+        var v = parseFloat(e.target.value);
+        if(!isNaN(v) && v >= 0) state.cash[k === 'saldo' ? 'saldo' : 'rate'] = v;
+        renderCash(); save();
+      });
+    });
+  }
+
+  function renderAll(){ renderObs(OBS,'obs'); renderObs(FORN,'forn'); renderEmps(); renderSummary(); renderCash(); }
+
+  document.getElementById('reset').addEventListener('click', function(){
+    state = { obs:{}, emps:{}, cash: state.cash };
+    renderAll(); save();
+  });
+
+  bindCash();
+  renderNotes(); renderAll();
+  load().then(renderAll);
+})();
+</script>
