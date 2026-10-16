@@ -1,72 +1,492 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
-<title>Gaming Hub — controlo de obrigações</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  :root{--ink:#14202B;--ink-soft:#4C5C68;--ink-faint:#7C8B96;--paper:#E9EDEF;--card:#fff;--rule:#C9D3DA;--ok:#1F7A4D;--due:#B3261E}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;line-height:1.45;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:820px;margin:0 auto;padding:26px 18px 60px}
-  .mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
-  header{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:24px}
-  h1{font-size:1.5rem;font-weight:600;margin:0 0 3px;letter-spacing:-.015em}
-  .sub{font-size:.78rem;color:var(--ink-soft)}
-  a.month{
-    display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
-    background:var(--card);border:1px solid var(--rule);border-left:5px solid var(--ink);
-    padding:15px 17px;margin-bottom:10px;text-decoration:none;color:inherit;
+  :root{
+    --ink:#14202B;
+    --ink-soft:#4C5C68;
+    --ink-faint:#7C8B96;
+    --paper:#E9EDEF;
+    --card:#FFFFFF;
+    --rule:#C9D3DA;
+    --rule-soft:#E1E7EA;
+    --fgts:#1B5E9B;
+    --darf:#4A5B6B;
+    --das:#1F7A4D;
+    --folha:#A8681B;
+    --due:#B3261E;
+    --ok:#1F7A4D;
+    --focus:#1B5E9B;
   }
-  a.month:hover{border-left-color:var(--ok)}
-  a.month:focus-visible{outline:2px solid var(--ok);outline-offset:2px}
-  .m-name{font-weight:600;font-size:1.05rem}
-  .m-note{font-size:.76rem;color:var(--ink-faint);margin-top:2px}
-  .m-val{text-align:right}
-  .m-val b{display:block;font-size:1.1rem;font-weight:600}
-  .m-val span{font-size:.72rem;color:var(--ink-soft)}
-  .m-val.open b{color:var(--due)}
-  .m-val.closed b{color:var(--ok)}
-  footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:12px;font-size:.73rem;color:var(--ink-faint)}
+  *{box-sizing:border-box}
+  .gh{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    padding:22px 18px 48px;
+    margin:0 auto;
+    max-width:1080px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  .gh .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+  /* ---------- cabeçalho ---------- */
+  .gh header{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;
+    border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:22px;
+  }
+  .gh h1{font-size:1.5rem;font-weight:600;margin:0 0 2px;letter-spacing:-.015em}
+  .gh .cnpj{font-size:.78rem;color:var(--ink-soft)}
+  .gh .comp{text-align:right}
+  .gh .comp b{display:block;font-size:1.15rem;font-weight:600}
+  .gh .comp span{font-size:.72rem;color:var(--ink-soft)}
+
+  /* ---------- talão de resumo (estilo guia) ---------- */
+  .gh .stub{
+    display:grid;grid-template-columns:1fr auto;gap:0;
+    border:1.5px solid var(--ink);background:var(--card);margin-bottom:26px;
+  }
+  .gh .stub-left{padding:16px 18px}
+  .gh .stub-left h2{margin:0 0 10px;font-size:.8rem;font-weight:600;color:var(--ink-soft)}
+  .gh .bar{height:12px;background:var(--rule-soft);border:1px solid var(--rule);display:flex;overflow:hidden}
+  .gh .bar i{display:block;height:100%;background:var(--ok);transition:width .35s ease}
+  .gh .stub-meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-size:.78rem;color:var(--ink-soft)}
+  .gh .stub-meta b{color:var(--ink);font-weight:600}
+  .gh .stub-right{
+    background:var(--ink);color:#fff;padding:16px 22px;text-align:right;min-width:230px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .gh .stub-right span{font-size:.72rem;opacity:.75;display:block}
+  .gh .stub-right .val{font-size:2.1rem;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+  .gh .stub-right .val-eur{font-size:1.15rem;font-weight:500;opacity:.8;line-height:1.5;margin-bottom:2px}
+
+  /* ---------- caixa ---------- */
+  .gh .cash{
+    display:grid;grid-template-columns:1fr 300px;
+    border:1.5px solid var(--ink);background:var(--card);
+  }
+  .gh .cash-in{padding:16px 18px}
+  .gh .cash-in label{display:block;font-size:.74rem;color:var(--ink-soft);margin-bottom:10px}
+  .gh .cash-in input{
+    display:block;margin-top:4px;width:100%;max-width:230px;
+    font-family:"IBM Plex Mono",monospace;font-size:1rem;font-variant-numeric:tabular-nums;
+    padding:7px 9px;border:1px solid var(--rule);background:#FAFCFC;color:var(--ink);
+  }
+  .gh .cash-in input:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+  .gh .hint{margin:2px 0 0;font-size:.74rem;color:var(--ink-faint);max-width:46ch;line-height:1.5}
+  .gh .cash-out{
+    background:#F5F7F8;border-left:1px solid var(--rule);padding:16px 18px;
+    display:flex;flex-direction:column;justify-content:center;gap:12px;
+  }
+  .gh .cash-line span{display:block;font-size:.72rem;color:var(--ink-soft)}
+  .gh .cash-line b{font-size:1.2rem;font-weight:600}
+  .gh .cash-line.big b{font-size:1.85rem;letter-spacing:-.02em;color:var(--due)}
+  .gh .cash-line.big.ok b{color:var(--ok)}
+
+
+  .gh h3{
+    font-size:.95rem;font-weight:600;margin:0 0 10px;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .gh h3 em{font-style:normal;font-size:.75rem;font-weight:400;color:var(--ink-faint)}
+  .gh section{margin-bottom:30px}
+
+  /* ---------- obrigação ---------- */
+  .gh .ob{
+    background:var(--card);border:1px solid var(--rule);border-left:5px solid var(--tone,var(--ink));
+    padding:14px 16px;margin-bottom:10px;
+    display:grid;grid-template-columns:1fr 150px 140px;gap:14px;align-items:center;
+  }
+  .gh .ob.paid{opacity:.62;border-left-color:var(--ok)}
+  .gh .ob-name{font-weight:600;font-size:.95rem;margin-bottom:3px}
+  .gh .chip{
+    display:inline-block;margin-right:8px;padding:1px 7px;vertical-align:1px;
+    font-family:"IBM Plex Mono",monospace;font-size:.64rem;font-weight:600;letter-spacing:.03em;
+    color:var(--ink-soft);background:var(--paper);border:1px solid var(--rule);
+  }
+  .gh .ob-doc{font-size:.72rem;color:var(--ink-faint)}
+  .gh .ob-break{font-size:.76rem;color:var(--ink-soft);margin-top:6px}
+  .gh .ob-val{text-align:right;font-size:1.12rem;font-weight:600}
+  .gh .ob-due{font-size:.74rem;color:var(--ink-soft);text-align:right;margin-top:2px}
+  .gh .ob-due.late{color:var(--due);font-weight:600}
+  .gh .ob-val.pend{color:var(--ink-faint);font-size:.9rem;font-weight:500;font-style:italic}
+  .gh .await{font-size:.72rem;color:var(--ink-faint);text-align:center;border:1px dashed var(--rule);padding:8px 6px}
+  .gh .paid-on{font-size:.72rem;color:var(--ok);margin-top:4px;text-align:center}
+
+  .gh button.toggle{
+    font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;width:100%;
+    padding:9px 8px;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);
+  }
+  .gh button.toggle:hover{background:var(--paper)}
+  .gh button.toggle.on{background:var(--ok);border-color:var(--ok);color:#fff}
+  .gh button.toggle:focus-visible,.gh button.mini:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+  /* ---------- tabela folha ---------- */
+  .gh table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--rule);font-size:.85rem}
+  .gh th{
+    text-align:right;font-size:.7rem;font-weight:600;color:var(--ink-soft);
+    padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap;
+  }
+  .gh th:first-child,.gh td:first-child{text-align:left}
+  .gh td{padding:9px 12px;border-bottom:1px solid var(--rule-soft);text-align:right}
+  .gh tbody tr:last-child td{border-bottom:none}
+  .gh tr.done td:not(:last-child){opacity:.5}
+  .gh .role{display:block;font-size:.7rem;color:var(--ink-faint)}
+  .gh tfoot td{border-top:1.5px solid var(--ink);font-weight:600;background:#F5F7F8}
+  .gh button.mini{
+    font:inherit;font-size:.72rem;font-weight:600;cursor:pointer;
+    padding:4px 10px;border:1px solid var(--rule);background:var(--card);color:var(--ink-soft);
+  }
+  .gh button.mini.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  /* ---------- notas ---------- */
+  .gh .notes{background:var(--card);border:1px solid var(--rule);padding:4px 0}
+  .gh .note{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:11px 16px;border-bottom:1px solid var(--rule-soft);font-size:.83rem}
+  .gh .note:last-child{border-bottom:none}
+  .gh .note .flag{font-weight:700;color:var(--due);font-size:.9rem;line-height:1.3}
+  .gh .note .flag.info{color:var(--fgts)}
+  .gh .note .flag.done{color:var(--ok)}
+  .gh .note b{font-weight:600}
+
+  .gh footer{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;
+    font-size:.73rem;color:var(--ink-faint);border-top:1px solid var(--rule);padding-top:12px}
+  .gh footer button{font:inherit;font-size:.73rem;cursor:pointer;background:none;border:none;color:var(--ink-soft);text-decoration:underline;padding:0}
+  .gh .status{font-size:.73rem;color:var(--ink-faint)}
+
+  @media (max-width:720px){
+    .gh .cash{grid-template-columns:1fr}
+    .gh .cash-out{border-left:none;border-top:1px solid var(--rule)}
+    .gh .stub{grid-template-columns:1fr}
+    .gh .stub-right{text-align:left;min-width:0}
+    .gh .ob{grid-template-columns:1fr;gap:10px}
+    .gh .ob-val,.gh .ob-due{text-align:left}
+    .gh th:nth-child(2),.gh td:nth-child(2),.gh th:nth-child(3),.gh td:nth-child(3){display:none}
+  }
+  @media (prefers-reduced-motion:reduce){.gh *{transition:none!important}}
 </style>
-</head>
-<body>
-<div class="wrap">
+
+<div class="gh">
   <header>
-    <h1>Gaming Hub — controlo de obrigações</h1>
-    <div class="sub mono">CNPJ 54.240.638/0001-29 · Recife/PE</div>
+    <div>
+      <h1>Gaming Hub — valores em falta pagar</h1>
+      <div class="cnpj mono">CNPJ 54.240.638/0001-29 · Recife/PE · Simples Nacional, Anexo III</div>
+    </div>
+    <div class="comp">
+      <b id="hoje">—</b>
+      <span>competências 08 e 09/2026</span>
+    </div>
   </header>
 
-  <div id="lista"></div>
+  <div class="stub">
+    <div class="stub-left">
+      <h2 id="progressLabel">A carregar…</h2>
+      <div class="bar"><i id="bar" style="width:0%"></i></div>
+      <div class="stub-meta">
+        <div>Saída total do mês <b class="mono" id="mTotal">—</b></div>
+        <div>Já pago <b class="mono" id="mPaid">—</b></div>
+        <div>Próximo vencimento <b class="mono" id="mNext">—</b></div>
+      </div>
+    </div>
+    <div class="stub-right">
+      <span>Falta pagar</span>
+      <div class="val mono" id="mDue">—</div>
+      <div class="val-eur mono" id="mDueEur">—</div>
+    </div>
+  </div>
 
-  <footer>Para acrescentar um mês: duplicar a pasta do mês anterior, atualizar os valores e juntar uma linha ao array MESES neste ficheiro.</footer>
+  <section>
+    <div class="cash">
+      <div class="cash-in">
+        <label>Saldo em conta (BRL)
+          <input id="saldo" type="number" step="0.01" inputmode="decimal">
+        </label>
+        <label>Câmbio EUR → BRL
+          <input id="rate" type="number" step="0.0001" inputmode="decimal">
+        </label>
+        <p class="hint" id="cashHint"></p>
+      </div>
+      <div class="cash-out">
+        <div class="cash-line"><span>Falta reforçar</span><b class="mono" id="gapBrl">—</b></div>
+        <div class="cash-line big"><span>A transferir de Portugal</span><b class="mono" id="gapEur">—</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Por pagar <em>por ordem de vencimento · marca conforme fores pagando</em></h3>
+    <div id="obs"></div>
+  </section>
+
+
+  <section>
+    <h3>Notas do mês</h3>
+    <div class="notes" id="notes"></div>
+  </section>
+
+  <footer>
+    <span class="status" id="status"></span>
+    <span><button id="sync">Sincronização</button> · <button id="reset">Limpar todos os pagamentos</button></span>
+  </footer>
 </div>
 
 <script>
-  // ---- Editar aqui a cada mês ----------------------------------------
-  var MESES = [
-    { pasta:'2026-08', nome:'Agosto 2026', total:57038.11, estado:'aberto',
-      nota:'folha, guias, 4 prestadores e contabilidade' }
+(function(){
+  var TODAY = (function(){ var d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); })();
+  var KEY = 'gaminghub:falta:v1';
+  var MES = 'agosto e setembro';
+
+  var OBS = [
+    { id:'parcela1', comp:'parcel.', name:'Parcelamento Simples Nacional — 1.ª parcela', tone:'var(--das)',
+      doc:'8 competências consolidadas (05/2025 a 08/2026) · 6 prestações',
+      brk:'Dívida consolidada 44.471,36 · inclui o DAS de 08/2026 já atualizado para 3.384,21',
+      val:7411.89, due:'2026-10-20', dueTxt:'20/10/2026' },
+    { id:'a-darf', comp:'ago/26', name:'DARF DCTFWeb', tone:'var(--darf)',
+      doc:'Documento 07.16.26247.4668228-6 · recibo 50000524052259',
+      brk:'INSS segurados 1.804,58 (cód. 1082) + IRRF 89,53 (cód. 0561) · valor original, sem multa e juros',
+      val:1894.11, due:'2026-09-18', dueTxt:'18/09/2026' },
+    { id:'s-fgts', comp:'set/26', name:'FGTS Digital + Consignado', tone:'var(--fgts)',
+      doc:'Guia 0126100665206291-3 · PIX na própria guia',
+      brk:'FGTS mensal 1.615,71 (6 trabalhadores) + consignado 646,17',
+      val:2261.88, due:'2026-10-20', dueTxt:'20/10/2026' },
+    { id:'s-darf', comp:'set/26', name:'DARF DCTFWeb', tone:'var(--darf)',
+      doc:'Documento 07.16.26282.0238956-0 · recibo 50000535968063',
+      brk:'INSS segurados 1.789,03 (cód. 1082) · sem IRRF este mês',
+      val:1789.03, due:'2026-10-20', dueTxt:'20/10/2026' },
+    { id:'s-das', comp:'set/26', name:'DAS Simples Nacional', tone:'var(--das)',
+      doc:'Guia por emitir',
+      brk:'Depende da receita bruta de setembro',
+      val:null, due:'2026-10-21', dueTxt:'vence 21/10/2026' }
   ];
+
+  var FORN = [
+    { id:'s-nelly', comp:'set/26', name:'Nelly Rodrigues (MEI)', tone:'#5B3E8E',
+      doc:'NFS-e 31 · CNPJ 60.342.308/0001-47 · Jaboatão dos Guararapes/PE',
+      brk:'Redação e textos para internet · valor fixo mensal',
+      val:2750.00, due:'2026-10-15', dueTxt:'15/10/2026' }
+  ];
+
+  var ALL = OBS.concat(FORN);
+
+  var NOTES = [
+    {t:'!', h:'Enviar um pouco acima do total.',
+     b:'O DARF de agosto venceu a 18 de setembro e o valor aqui é o da guia original. Para pagar agora é preciso reemitir com a data do pagamento, o que acrescenta multa e juros. Convém reforçar a conta com uma margem acima do total apresentado para cobrir esses acréscimos.'},
+    {t:'!', h:'Segunda-feira, 20/10, têm que ser pagos 11.462,80.',
+     b:'A primeira parcela do parcelamento, o FGTS e o DARF de setembro vencem todos no mesmo dia. O DAS de setembro vence no dia seguinte.'},
+    {t:'i', h:'O DAS de agosto já não aparece à parte.',
+     b:'Entrou no parcelamento, onde está consolidado em 3.384,21. Pagá-lo em separado seria duplicar.'},
+    {t:'i', h:'Faltam 5 parcelas depois desta.',
+     b:'7.411,89 por mês até março de 2027, além das obrigações correntes de cada competência.'},
+    {t:'i', h:'Falta o DAS de setembro.',
+     b:'É o único documento ainda por receber. Em agosto foi 2.796,92 sobre 29.000,00 de receita.'}
+  ];
+
+  // ---- Sincronização: colar aqui o endereço do Worker ----------------
+  var API = 'https://controlo-estado.dgomez1903.workers.dev';   // ex: https://controlo-estado.o-teu-nome.workers.dev
   // --------------------------------------------------------------------
 
-  var brl = function(v){ return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
-  var box = document.getElementById('lista');
+  var remoto = false;
+  function pw(){ try{ return localStorage.getItem('gh:pw') || ''; }catch(e){ return ''; } }
+  function ligado(){ return API.indexOf('http') === 0 && pw() !== ''; }
 
-  MESES.forEach(function(m){
-    var a = document.createElement('a');
-    a.className = 'month';
-    a.href = m.pasta + '/';
-    a.innerHTML =
-      '<div><div class="m-name">'+m.nome+'</div><div class="m-note">'+m.nota+'</div></div>'+
-      '<div class="m-val '+(m.estado==='fechado'?'closed':'open')+'">'+
-      '<b class="mono">'+brl(m.total)+'</b><span>'+(m.estado==='fechado'?'fechado':'por fechar')+'</span></div>';
-    box.appendChild(a);
+  var STORE = {
+    get: async function(k){
+      if(window.storage && window.storage.get) return window.storage.get(k);
+      if(ligado()){
+        var r = await fetch(API+'?k='+encodeURIComponent(k)+'&t='+Date.now(), { cache:'no-store', headers:{'X-Pw':pw()} });
+        if(r.status === 401){ remoto = false; throw new Error('senha errada'); }
+        if(r.ok){ remoto = true; var t = await r.text(); localStorage.setItem(k,t); return {key:k, value:t}; }
+        if(r.status === 404){ remoto = true; throw new Error('sem registo'); }
+        remoto = false;
+      }
+      var v = localStorage.getItem(k);
+      if(v === null) throw new Error('sem registo');
+      return {key:k, value:v};
+    },
+    set: async function(k,v){
+      if(window.storage && window.storage.set) return window.storage.set(k,v);
+      localStorage.setItem(k,v);
+      if(ligado()){
+        var r = await fetch(API+'?k='+encodeURIComponent(k), {
+          method:'POST', headers:{'X-Pw':pw(),'Content-Type':'application/json'}, body:v
+        });
+        remoto = r.ok;
+        if(!r.ok) throw new Error('remoto falhou');
+      }
+      return {key:k, value:v};
+    }
+  };
+
+  var state = { obs:{}, emps:{}, cash:{ saldo:14515.27, rate:5.93 } };
+  var st = document.getElementById('status');
+
+  function brl(v){ return v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function days(iso){
+    var p = iso.split('-'); var d = new Date(+p[0], p[1]-1, +p[2]);
+    return Math.round((d - TODAY)/86400000);
+  }
+  function stamp(){
+    var d = new Date();
+    return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  }
+
+  async function save(){
+    try{
+      st.textContent = 'A guardar…';
+      await STORE.set(KEY, JSON.stringify(state));
+      st.textContent = remoto ? 'Sincronizado — visível em todos os dispositivos.'
+                              : 'Guardado só neste dispositivo.';
+    }catch(e){
+      st.textContent = 'Guardado neste dispositivo, mas a sincronização falhou. Verifica a senha.';
+    }
+  }
+
+  async function load(){
+    try{
+      var r = await STORE.get(KEY);
+      if(r && r.value){ var v = JSON.parse(r.value); state.obs = v.obs||{}; if(v.cash) state.cash = v.cash; }
+      st.textContent = remoto ? 'Sincronizado — visível em todos os dispositivos.'
+                              : (ligado() ? 'Guardado só neste dispositivo.' : 'Sem sincronização. Clica em Sincronização para ligar.');
+    }catch(e){
+      st.textContent = e.message === 'senha errada'
+        ? 'Senha errada. Clica em Sincronização para a corrigir.'
+        : 'Sem registo anterior — começa do zero.';
+    }
+  }
+
+  function renderObs(list, boxId){
+    var box = document.getElementById(boxId); box.innerHTML='';
+    list = list.slice().sort(function(a,b){
+      if(!a.due && !b.due) return 0;
+      if(!a.due) return 1;
+      if(!b.due) return -1;
+      return a.due < b.due ? -1 : (a.due > b.due ? 1 : 0);
+    });
+    list.forEach(function(o){
+      var paid = o.val === null ? null : state.obs[o.id];
+      var dd = o.due ? days(o.due) : null;
+      var late = !paid && dd !== null && dd < 0;
+      var dueLine = dd === null ? o.dueTxt
+        : paid ? ('vencimento '+o.dueTxt)
+        : (dd < 0 ? ('em atraso · '+o.dueTxt) : (dd === 0 ? ('vence hoje · '+o.dueTxt) : ('faltam '+dd+' dias · '+o.dueTxt)));
+
+      var el = document.createElement('div');
+      el.className = 'ob' + (paid ? ' paid' : '');
+      el.style.setProperty('--tone', o.tone);
+      el.innerHTML =
+        '<div><div class="ob-name"><span class="chip">'+o.comp+'</span>'+o.name+'</div>'+
+        '<div class="ob-doc mono">'+o.doc+'</div>'+
+        '<div class="ob-break">'+o.brk+'</div></div>'+
+        '<div><div class="ob-val mono'+(o.val===null?' pend':'')+'">'+(o.val===null?'a confirmar':brl(o.val))+'</div>'+
+        '<div class="ob-due'+(late?' late':'')+'">'+dueLine+'</div></div>'+
+        (o.val===null
+          ? '<div class="await">documento em falta</div>'
+          : '<div><button class="toggle'+(paid?' on':'')+'">'+(paid?'Pago':'Marcar pago')+'</button>'+
+            (paid && paid.on ? '<div class="paid-on">em '+paid.on+'</div>' : '')+'</div>');
+
+      var btn = el.querySelector('button');
+      if(btn) btn.addEventListener('click', function(){
+        if(state.obs[o.id]) delete state.obs[o.id];
+        else state.obs[o.id] = { on: stamp() };
+        renderAll(); save();
+      });
+      box.appendChild(el);
+    });
+  }
+
+  function renderNotes(){
+    var box = document.getElementById('notes'); box.innerHTML='';
+    NOTES.forEach(function(n){
+      var d = document.createElement('div');
+      var cls = n.t==='i' ? ' info' : (n.t==='v' ? ' done' : '');
+      var mark = n.t==='i' ? 'i' : (n.t==='v' ? '✓' : '!');
+      d.className='note';
+      d.innerHTML = '<div class="flag'+cls+'">'+mark+'</div>'+
+                    '<div><b>'+n.h+'</b> '+n.b+'</div>';
+      box.appendChild(d);
+    });
+  }
+
+  function renderSummary(){
+    var total=0, paid=0, next=null, pend=0;
+    ALL.forEach(function(o){
+      if(o.val === null){ pend++; return; }
+      total += o.val;
+      if(state.obs[o.id]) paid += o.val;
+      else if(o.due && (!next || o.due < next.due)) next = o;
+    });
+    var dueLeft = total - paid;
+    document.getElementById('mTotal').textContent = brl(total);
+    document.getElementById('mPaid').textContent = brl(paid);
+    document.getElementById('mDue').textContent = 'R$ '+brl(dueLeft);
+    document.getElementById('mDueEur').textContent = '€ '+brl(dueLeft/(state.cash.rate || 5.90));
+    document.getElementById('mNext').textContent = next ? next.dueTxt.replace('venceu ','') : 'nenhum';
+    document.getElementById('bar').style.width = (paid/total*100).toFixed(1)+'%';
+
+    var n = ALL.filter(function(o){ return o.val !== null && !state.obs[o.id]; }).length;
+    var tot = ALL.filter(function(o){ return o.val !== null; }).length;
+    var txt = n === 0 ? 'Tudo pago em '+MES : n+' de '+tot+' pagamentos por fazer';
+    if(pend) txt += ' · '+pend+(pend===1?' documento em falta':' documentos em falta');
+    document.getElementById('progressLabel').textContent = txt;
+
+  }
+
+  function renderCash(){
+    var due = 0;
+    ALL.forEach(function(o){ if(o.val !== null && !state.obs[o.id]) due += o.val; });
+    var saldo = state.cash.saldo || 0;
+    var rate = state.cash.rate || 5.93;
+    var gap = due - saldo;
+
+    document.getElementById('saldo').value = saldo.toFixed(2);
+    document.getElementById('rate').value = rate;
+
+    var big = document.querySelector('.cash-line.big');
+    if(gap > 0){
+      big.classList.remove('ok');
+      document.getElementById('gapBrl').textContent = 'R$ '+brl(gap);
+      document.getElementById('gapEur').textContent = '€ '+brl(gap/rate);
+      document.getElementById('cashHint').textContent =
+        'Faltam '+brl(due)+' para cobrir tudo o que ainda não está marcado como pago. O câmbio é indicativo — a transferência real leva spread e IOF por cima.';
+    }else{
+      big.classList.add('ok');
+      document.getElementById('gapBrl').textContent = 'R$ 0,00';
+      document.getElementById('gapEur').textContent = '€ 0,00';
+      document.getElementById('cashHint').textContent =
+        'O saldo cobre o que falta pagar, com folga de '+brl(-gap)+' BRL.';
+    }
+  }
+
+  function bindCash(){
+    ['saldo','rate'].forEach(function(k){
+      document.getElementById(k).addEventListener('change', function(e){
+        var v = parseFloat(e.target.value);
+        if(!isNaN(v) && v >= 0) state.cash[k === 'saldo' ? 'saldo' : 'rate'] = v;
+        renderCash(); save();
+      });
+    });
+  }
+
+  function renderAll(){ renderObs(ALL,'obs'); renderSummary(); renderCash(); }
+
+  document.getElementById('reset').addEventListener('click', function(){
+    state = { obs:{}, cash: state.cash };
+    renderAll(); save();
   });
+
+  document.getElementById('sync').addEventListener('click', function(){
+    var atual = pw();
+    var nova = prompt('Senha de sincronização (a mesma em todos os dispositivos):', atual);
+    if(nova === null) return;
+    try{ localStorage.setItem('gh:pw', nova.trim()); }catch(e){}
+    load().then(renderAll);
+  });
+
+  document.getElementById('hoje').textContent = stamp();
+
+  bindCash();
+  renderNotes(); renderAll();
+  load().then(renderAll);
+})();
 </script>
-</body>
-</html>
